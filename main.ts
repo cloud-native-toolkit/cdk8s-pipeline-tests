@@ -29,7 +29,7 @@ class PipelineRunTest extends Chart {
       .withDescription('This pipeline closes a repository')
       .withTask(myTask)
       .withStringParam(pipelineParam);
-    pipeline.buildPipeline({ includeDependencies: true });
+    pipeline.buildPipeline({ includeDependencies: false });
 
     new PipelineRunBuilder(this, 'my-pipeline-run', pipeline)
       .withRunParam('repo-url', 'https://github.com/exmaple/my-repo')
