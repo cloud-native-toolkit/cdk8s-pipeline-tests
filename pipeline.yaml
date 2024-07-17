@@ -16,7 +16,7 @@ spec:
     description: Branch to be used
   - name: GIT_TEST_URL 
     type: string
-    default: https://github.com/snehajais22/cdk8s-deploy
+    default: https://github.com/cloud-native-toolkit/cdk8s-pipeline-tests
     description: Test file repository
   - name: GIT_TEST_REVISION
     type: string

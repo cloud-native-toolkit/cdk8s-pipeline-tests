@@ -11,7 +11,7 @@ spec:
     - name: GIT_SOURCE_REVISION
       value: develop
     - name: GIT_TEST_URL
-      value: https://github.com/snehajais22/cdk8s-deploy
+      value: https://github.com/cloud-native-toolkit/cdk8s-pipeline-tests
     - name: GIT_TEST_REVISION
       value: test
     - name: namespace
