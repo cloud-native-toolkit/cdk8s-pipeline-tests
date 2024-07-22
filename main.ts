@@ -18,12 +18,24 @@ class PipelineRunTest extends Chart {
     const pipelineParam = new ParameterBuilder('repo-url')
       .withDefaultValue('');
 
-    const myTask = new TaskBuilder(this, 'git-clone')
+    const myTask = new TaskBuilder(this, 'clone-git')
+      .specifyRunAfter([])
       .withName('fetch-source')
       .withWorkspace(new WorkspaceBuilder('output')
         .withBinding('shared-data')
         .withDescription('The files cloned by the task'))
-      .withStringParam(new ParameterBuilder('url').withValue(fromPipelineParam(pipelineParam)));
+      .withStringParam(new ParameterBuilder('url').withValue(fromPipelineParam(pipelineParam)))
+      .withResult('status', 'Status of the task')
+      .withStep(new TaskStepBuilder()
+        .withName('step')
+        .withImage('ubuntu')
+        .fromScriptData('#!/usr/bin/env bash\necho $(params.url)'));
+    const myTask2 = new TaskBuilder(this, 'task-two')
+      .specifyRunAfter(['fetch-source'])
+      .withStep(new TaskStepBuilder()
+        .withName('echo')
+        .withImage('ubuntu')
+        .fromScriptData('#!/usr/bin/env bash\necho These logs print after'));
 
     const pipeline = new PipelineBuilder(this, 'clone-build-push')
       .withDescription('This pipeline closes a repository')
