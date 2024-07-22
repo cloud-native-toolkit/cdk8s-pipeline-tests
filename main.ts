@@ -1,5 +1,6 @@
-import { App, Chart } from 'cdk8s';
+import { App, Chart, Size } from 'cdk8s';
 import { ChartProps } from 'cdk8s/lib/chart';
+import { PersistentVolumeClaim, PersistentVolumeClaimProps, PersistentVolumeAccessMode } from 'cdk8s-plus-27';
 import { Construct } from 'constructs';
 // @ts-ignore
 import {
@@ -7,8 +8,10 @@ import {
   PipelineBuilder,
   PipelineRunBuilder,
   TaskBuilder,
+  TaskStepBuilder,
   WorkspaceBuilder,
   fromPipelineParam,
+  ClusterTaskResolver,
 } from '../src';
 
 class PipelineRunTest extends Chart {
@@ -29,7 +32,7 @@ class PipelineRunTest extends Chart {
       .withStep(new TaskStepBuilder()
         .withName('step')
         .withImage('ubuntu')
-        .fromScriptData('#!/usr/bin/env bash\necho $(params.url)\necho Test'));
+        .fromScriptData('#!/usr/bin/env bash\necho $(params.url)'));
     const myTask2 = new TaskBuilder(this, 'task-two')
       .specifyRunAfter(['fetch-source'])
       .withStep(new TaskStepBuilder()
@@ -37,15 +40,19 @@ class PipelineRunTest extends Chart {
         .withImage('ubuntu')
         .fromScriptData('#!/usr/bin/env bash\necho These logs print after'));
 
+    const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
+    new PersistentVolumeClaim(this, 'datapvc', pvcProps);
+
     const pipeline = new PipelineBuilder(this, 'clone-build-push')
       .withDescription('This pipeline closes a repository')
       .withTask(myTask)
+      .withTask(myTask2)
       .withStringParam(pipelineParam);
-    pipeline.buildPipeline({ includeDependencies: false });
+    pipeline.buildPipeline({ includeDependencies: true });
 
     new PipelineRunBuilder(this, 'my-pipeline-run', pipeline)
       .withRunParam('repo-url', 'https://github.com/exmaple/my-repo')
-      .withWorkspace('shared-data', 'dataPVC', 'my-shared-data')
+      .withWorkspace('shared-data', 'datapvc', 'my-shared-data')
       .buildPipelineRun({ includeDependencies: true });
   }
 }
