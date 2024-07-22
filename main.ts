@@ -11,7 +11,6 @@ import {
   TaskStepBuilder,
   WorkspaceBuilder,
   fromPipelineParam,
-  ClusterTaskResolver,
 } from '../src';
 
 class PipelineRunTest extends Chart {
