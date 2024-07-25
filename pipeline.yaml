@@ -135,6 +135,13 @@ spec:
             echo "waiting for test pods to complete..."
 
             for (( n = 1; n <= $(($(params.timelimit))); n++ )) ; do
+              # gets status of pipelineruns, if any
+              pipelineruns=$(oc get pipelinerun -n $(params.namespace) -o jsonpath='{.items[*].status.conditions[0].type}')
+              if [[ $pipelineruns =~ "Failed" ]]; then
+                echo "At least one PipelineRun failed!"
+                exit 1
+              fi
+
               # gets status of current pods as array of strings
               pods=()
               phases=()
