@@ -11,6 +11,7 @@ import {
   TaskStepBuilder,
   WorkspaceBuilder,
   fromPipelineParam,
+  ClusterTaskResolver,
 } from '../src';
 
 class PipelineRunTest extends Chart {
@@ -56,6 +57,44 @@ class PipelineRunTest extends Chart {
   }
 }
 
+class PipelineRunTestWithResolver extends Chart {
+  constructor(scope: Construct, id: string, props?: ChartProps) {
+    super(scope, id, props);
+
+    const myWorkspace = new WorkspaceBuilder('output')
+      .withDescription('The files cloned by the task')
+      .withBinding('shared-data');
+
+    const pipelineParam = new ParameterBuilder('repo-url')
+      .withDefaultValue('');
+
+    const urlParam = new ParameterBuilder('url')
+      .withValue(fromPipelineParam(pipelineParam));
+
+    const resolver = new ClusterTaskResolver('git-clone', 'default');
+
+    const myTask = new TaskBuilder(this, 'fetch-source')
+      .referencingTask(resolver)
+      .withWorkspace(myWorkspace)
+      .withStringParam(urlParam);
+
+    const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
+    new PersistentVolumeClaim(this, 'datapvc', pvcProps);
+
+    const pipeline = new PipelineBuilder(this, 'clone-build-push')
+      .withDescription('This pipeline closes a repository, builds a Docker image, etc.')
+      .withTask(myTask)
+      .withStringParam(pipelineParam);
+    pipeline.buildPipeline({ includeDependencies: true });
+
+    new PipelineRunBuilder(this, 'my-pipeline-run', pipeline)
+      .withRunParam('repo-url', 'https://github.com/cloud-native-toolkit/cdk8s-pipeline-tests')
+      .withWorkspace('shared-data', 'datapvc', 'my-shared-data')
+      .buildPipelineRun({ includeDependencies: true });
+  }
+}
+
 const app = new App();
-new PipelineRunTest(app, 'test-pipeline-run');
+//new PipelineRunTest(app, 'test-pipeline-run');
+new PipelineRunTestWithResolver(app, 'pipeline-run-with-resolver');
 app.synth();
