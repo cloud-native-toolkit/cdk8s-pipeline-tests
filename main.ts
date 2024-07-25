@@ -71,7 +71,7 @@ class PipelineRunTestWithResolver extends Chart {
     const urlParam = new ParameterBuilder('url')
       .withValue(fromPipelineParam(pipelineParam));
 
-    const resolver = new ClusterTaskResolver('git-clone', 'default');
+    const resolver = new ClusterTaskResolver('git-clone', 'openshift-pipelines');
 
     const myTask = new TaskBuilder(this, 'fetch-source')
       .referencingTask(resolver)
