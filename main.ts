@@ -90,7 +90,7 @@ class PipelineRunTestWithResolver extends Chart {
     const pipeline = new PipelineBuilder(this, 'clone-build-push')
       .withDescription('This pipeline closes a repository, builds a Docker image, etc.')
       .withTask(myTask)
-      .withTask(myTask)
+      .withTask(myTask2)
       .withStringParam(pipelineParam);
     pipeline.buildPipeline({ includeDependencies: true });
 
