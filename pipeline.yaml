@@ -142,6 +142,13 @@ spec:
                 exit 1
               fi
 
+              # gets status of taskruns, if any
+              taskruns=$(oc get taskrun -n $(params.namespace) -o jsonpath='{.items[*].status.conditions[0].type}')
+              if [[ $taskruns =~ "Failed" ]]; then
+                echo "At least one TaskRun failed!"
+                exit 1
+              fi
+
               # gets status of current pods as array of strings
               pods=()
               phases=()
