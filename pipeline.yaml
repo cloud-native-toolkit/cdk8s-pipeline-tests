@@ -137,7 +137,7 @@ spec:
             for (( n = 1; n <= $(($(params.timelimit))); n++ )) ; do
               # gets status of pipelineruns, if any
               pipelineruns=$(oc get pipelinerun -n $(params.namespace) -o jsonpath='{.items[*].status.conditions[0].status}')
-              if [[ $pipelineruns =~ "False" || $pipelineruns =~ "Unknown" ]]; then
+              if [[ $pipelineruns =~ "False" ]]; then
                 echo "At least one PipelineRun failed!"
                 echo "Printing reason and message..."
                 oc get pipelinerun -n $(params.namespace) -o jsonpath='{range .items[*]}{.status.conditions[0].reason}{"\n"}{end}'
@@ -147,7 +147,7 @@ spec:
 
               # gets status of taskruns, if any
               taskruns=$(oc get taskrun -n $(params.namespace) -o jsonpath='{.items[*].status.conditions[0].status}')
-              if [[ $taskruns =~ "False" || $taskruns =~ "Unknown" ]]; then
+              if [[ $taskruns =~ "False" ]]; then
                 echo "At least one TaskRun failed!"
                 echo "Printing reason and message..."
                 oc get taskrun -n $(params.namespace) -o jsonpath='{range .items[*]}{.status.conditions[0].reason}{"\n"}{end}'
