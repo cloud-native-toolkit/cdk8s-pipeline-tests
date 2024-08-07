@@ -13,6 +13,7 @@ import {
   WorkspaceBuilder,
   fromPipelineParam,
   ClusterRemoteResolver,
+  createRoleBindingProps,
 } from '../src';
 
 class PipelineRunTest extends Chart {
@@ -136,9 +137,12 @@ class TestTaskRunResolver extends Chart {
     const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
     new PersistentVolumeClaim(this, 'datapvc', pvcProps);
 
+    const CRB = createRoleBindingProps('','','','','');
+
     new TaskRunBuilder(this, 'git-clone-run', resolver)
       .withRunParam('URL', 'https://github.com/cloud-native-toolkit/cdk8s-pipeline-tests')
       .withWorkspace('output', 'datapvc', '')
+      .withClusterRoleBindingProps(CRB)
       .buildTaskRun({ includeDependencies: true });
   }
 }
