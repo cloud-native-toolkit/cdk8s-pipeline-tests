@@ -127,25 +127,8 @@ class TestTaskRunBuilder extends Chart {
   }
 }
 
-class TestTaskRunResolver extends Chart {
-  constructor(scope: Construct, id: string, props?: ChartProps) {
-    super(scope, id, props);
-    
-    const resolver = new ClusterRemoteResolver('task', 'git-clone', 'openshift-pipelines');
-
-    const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
-    new PersistentVolumeClaim(this, 'datapvc', pvcProps);
-
-    new TaskRunBuilder(this, 'git-clone-run', resolver)
-      .withRunParam('URL', 'https://github.com/cloud-native-toolkit/cdk8s-pipeline-tests')
-      .withWorkspace('output', 'datapvc', '')
-      .buildTaskRun({ includeDependencies: false });
-  }
-}
-
 const app = new App();
 // new PipelineRunTest(app, 'test-pipeline-run');
-// new PipelineRunTestWithResolver(app, 'pipeline-run-with-resolver');
+new PipelineRunTestWithResolver(app, 'pipeline-run-with-resolver');
 // new TestTaskRunBuilder(app, 'test-task-run');
-new TestTaskRunResolver(app, 'test-task-run-resolver');
 app.synth();
