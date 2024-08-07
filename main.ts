@@ -9,7 +9,6 @@ import {
   PipelineRunBuilder,
   TaskBuilder,
   TaskStepBuilder,
-  TaskRunBuilder,
   WorkspaceBuilder,
   fromPipelineParam,
   ClusterRemoteResolver,
@@ -102,30 +101,30 @@ class PipelineRunTestWithResolver extends Chart {
   }
 }
 
-class TestTaskRunBuilder extends Chart {
-  constructor(scope: Construct, id: string, props?: ChartProps) {
-    super(scope, id, props);
+// class TestTaskRunBuilder extends Chart {
+//   constructor(scope: Construct, id: string, props?: ChartProps) {
+//     super(scope, id, props);
 
-    const myTask = new TaskBuilder(this, 'echo-input')
-      .withWorkspace(new WorkspaceBuilder('output')
-        .withDescription('The files cloned by the task'))
-      .withStringParam(new ParameterBuilder('input'))
-      .withStep(new TaskStepBuilder()
-        .withName('step')
-        .withImage('ubuntu')
-        .fromScriptData('#!/usr/bin/env bash\necho $(params.input)'));
-    myTask.buildTask();
+//     const myTask = new TaskBuilder(this, 'echo-input')
+//       .withWorkspace(new WorkspaceBuilder('output')
+//         .withDescription('The files cloned by the task'))
+//       .withStringParam(new ParameterBuilder('input'))
+//       .withStep(new TaskStepBuilder()
+//         .withName('step')
+//         .withImage('ubuntu')
+//         .fromScriptData('#!/usr/bin/env bash\necho $(params.input)'));
+//     myTask.buildTask();
 
-    const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
-    new PersistentVolumeClaim(this, 'datapvc', pvcProps);
+//     const pvcProps : PersistentVolumeClaimProps = { metadata: { name: 'datapvc' }, accessModes: [PersistentVolumeAccessMode.READ_WRITE_ONCE], storage: Size.gibibytes(1) };
+//     new PersistentVolumeClaim(this, 'datapvc', pvcProps);
 
-    new TaskRunBuilder(this, 'echo-input-run', myTask)
-      .withRunParam('input', 'Hello World!')
-      .withWorkspace('output', 'datapvc', '')
-      .withServiceAccount('default')
-      .buildTaskRun({ includeDependencies: true });
-  }
-}
+//     new TaskRunBuilder(this, 'echo-input-run', myTask)
+//       .withRunParam('input', 'Hello World!')
+//       .withWorkspace('output', 'datapvc', '')
+//       .withServiceAccount('default')
+//       .buildTaskRun({ includeDependencies: true });
+//   }
+// }
 
 const app = new App();
 // new PipelineRunTest(app, 'test-pipeline-run');
