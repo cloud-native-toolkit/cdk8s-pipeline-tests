@@ -12,7 +12,7 @@ import {
   TaskRunBuilder,
   WorkspaceBuilder,
   fromPipelineParam,
-  ClusterTaskResolver,
+  ClusterRemoteResolver,
 } from '../src';
 
 class PipelineRunTest extends Chart {
@@ -72,7 +72,7 @@ class PipelineRunTestWithResolver extends Chart {
     const urlParam = new ParameterBuilder('URL')
       .withValue(fromPipelineParam(pipelineParam));
 
-    const resolver = new ClusterTaskResolver('task', 'git-clone', 'openshift-pipelines');
+    const resolver = new ClusterRemoteResolver('task', 'git-clone', 'openshift-pipelines');
 
     const myTask = new TaskBuilder(this, 'fetch-source')
       .referencingTask(resolver)
