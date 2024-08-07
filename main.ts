@@ -122,6 +122,7 @@ class TestTaskRunBuilder extends Chart {
     new TaskRunBuilder(this, 'echo-input-run', myTask)
       .withRunParam('input', 'Hello World!')
       .withWorkspace('output', 'datapvc', '')
+      .withServiceAccount('default')
       .buildTaskRun({ includeDependencies: true });
   }
 }
